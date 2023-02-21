@@ -1,4 +1,5 @@
 import requests
+import matplotlib.pyplot as plt
 
 def get_price_data(crypto, time):
     # Set the Coingecko API endpoint
@@ -35,6 +36,10 @@ if __name__ == "__main__":
     # Prompt the user to enter the required inputs
     crypto = input("Enter the name of the cryptocurrency: ")
     time = input("Enter the time period to fetch data for (1, 7, 30, or 365 days): ")
+    currency = input("Enter the fiat currency to compare to (default is USD): ")
+    if currency == "":
+        currency = "usd"
+    days = int(input("Enter the number of days to use for the moving average calculation (default is 7): ") or "7")
 
     # Fetch price data for the specified cryptocurrency and time period
     prices = get_price_data(crypto, time)
@@ -42,7 +47,13 @@ if __name__ == "__main__":
     # Check if price data is available
     if len(prices) > 0:
         # Predict the next price based on the moving average
-        next_price = predict_price(prices, 7)
+        next_price = predict_price(prices, days)
 
         # Print the predicted price
-        print(f"The predicted price of {crypto} in the next {time} days is ${next_price:.2f}")
+        print(f"The predicted price of {crypto} in the next {time} days is {currency.upper()} {next_price:.2f}")
+
+        # Plot the price data
+        plt.plot(prices)
+        plt.xlabel('Time')
+        plt.ylabel(f'{crypto.upper()} Price ({currency.upper()})')
+        plt.show()
