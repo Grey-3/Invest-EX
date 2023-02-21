@@ -5,11 +5,11 @@ Invest-EX is a Python program that predicts the next price of a specified crypto
 
 Clone the repository:
 ```
-git clone https://github.com/yourusername/your-repo-name.git
+git clone https://github.com/grey-sz/Invest-EX.git
 ```
 Change into the project directory:
 ```
-cd your-repo-name
+cd Invest-EX
 ```
 Install the required packages:
 ```
