@@ -1,23 +1,61 @@
-# Invest-EX
+# InvestEX
+
 Invest-EX is a Python program that predicts the next price of a specified cryptocurrency using the Coingecko API. It uses a moving average calculation to predict the next price.
+## Installation 
 
-# Features
-Predicts the next price of a specified cryptocurrency using the Coingecko API.
-Uses a moving average calculation to predict the next price.
-User-friendly command-line interface.
-Supports four different time periods: 1, 7, 30, or 365 days.
+Clone the repository:
+```
+git clone https://github.com/yourusername/your-repo-name.git
+```
+Change into the project directory:
+```
+cd your-repo-name
+```
+Install the required packages:
+```
+pip install -r requirements.txt
+```
+Start the server:
+```
+python app.py
+```
+The app should now be running on http://localhost:5000.
 
-# Documentation
-get_price_data(crypto, time)
-Fetches price data for the specified cryptocurrency and time period.
 
-crypto: The name of the cryptocurrency to fetch price data for.
-time: The time period to fetch price data for. Must be one of the following: 1, 7, 30, or 365.
-Returns a list of price data.
+## API Reference
 
-predict_price(prices, n)
-Predicts the next price based on the moving average of the price data.
+#### Example Request
 
-prices: A list of price data.
-n: The number of prices to use in the moving average calculation.
-Returns the predicted price
+```bash
+  GET http://localhost:5000/get_price_data?crypto=bitcoin&time=30
+```
+#### Example Response
+
+```json
+  {
+  "prices": [
+    40214.82529032752,
+    38866.16977770458,
+    39108.25893500827,
+    //...
+  ]
+}
+```
+
+| Parameter | Required     | Description                |
+| :-------- | :------- | :------------------------- |
+| `crypto` | `Yes` |   `The ID of the cryptocurrency (e.g. "bitcoin")` |
+| `time` | `Yes` |   `The number of days of historical data to use in the prediction (e.g. 30, 60, 90)` |
+| `days` | `No` |   `The number of days in the future to predict the price (default is 7)` |
+
+#### Example Request
+
+``` bash
+GET http://localhost:5000/predict_price?crypto=bitcoin&time=30&days=7
+```
+#### Example Request
+``` json
+{
+  "predicted_price": 52333.157479312136
+}
+```
