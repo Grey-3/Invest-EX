@@ -1,59 +1,52 @@
+from flask import Flask, request, jsonify
 import requests
-import matplotlib.pyplot as plt
 
-def get_price_data(crypto, time):
-    # Set the Coingecko API endpoint
+app = Flask(__name__)
+
+@app.route('/get_price_data', methods=['GET'])
+def get_price_data():
+    crypto = request.args.get('crypto')
+    time = request.args.get('time')
+    
     url = f"https://api.coingecko.com/api/v3/coins/{crypto}/market_chart?vs_currency=usd&days={time}"
     
-    # Make a request to the Coingecko API
     response = requests.get(url)
     
-    # Print the response JSON
-    print(response.json())
-    
-    # Parse the response JSON
     data = response.json()
     
-    # Extract the price data
     if 'prices' in data:
         prices = [p[1] for p in data['prices']]
     else:
-        print(f"Error: could not retrieve price data for {crypto} with time {time}")
-        prices = []
+        error = f"Error: could not retrieve price data for {crypto} with time {time}"
+        return jsonify(error=error), 404
     
-    return prices
+    return jsonify(prices=prices), 200
 
-def predict_price(prices, n):
-    # Calculate the moving average of the price data
-    moving_average = sum(prices[-n:]) / n
+@app.route('/predict_price', methods=['GET'])
+def predict_price():
+    crypto = request.args.get('crypto')
+    time = request.args.get('time')
+    days = int(request.args.get('days', '7'))
     
-    # Predict the next price based on the moving average
-    next_price = moving_average * 2 - prices[-n]
+    url = f"https://api.coingecko.com/api/v3/coins/{crypto}/market_chart?vs_currency=usd&days={time}"
     
-    return next_price
+    response = requests.get(url)
+    
+    data = response.json()
+    
+    if 'prices' in data:
+        prices = [p[1] for p in data['prices']]
+    else:
+        error = f"Error: could not retrieve price data for {crypto} with time {time}"
+        return jsonify(error=error), 404
+    
+    if len(prices) >= days:
+        moving_average = sum(prices[-days:]) / days
+        next_price = moving_average * 2 - prices[-days]
+        return jsonify(predicted_price=next_price), 200
+    else:
+        error = f"Error: not enough data available to make prediction for {crypto} with time {time}"
+        return jsonify(error=error), 404
 
-if __name__ == "__main__":
-    # Prompt the user to enter the required inputs
-    crypto = input("Enter the name of the cryptocurrency: ")
-    time = input("Enter the time period to fetch data for (1, 7, 30, or 365 days): ")
-    currency = input("Enter the fiat currency to compare to (default is USD): ")
-    if currency == "":
-        currency = "usd"
-    days = int(input("Enter the number of days to use for the moving average calculation (default is 7): ") or "7")
-
-    # Fetch price data for the specified cryptocurrency and time period
-    prices = get_price_data(crypto, time)
-
-    # Check if price data is available
-    if len(prices) > 0:
-        # Predict the next price based on the moving average
-        next_price = predict_price(prices, days)
-
-        # Print the predicted price
-        print(f"The predicted price of {crypto} in the next {time} days is {currency.upper()} {next_price:.2f}")
-
-        # Plot the price data
-        plt.plot(prices)
-        plt.xlabel('Time')
-        plt.ylabel(f'{crypto.upper()} Price ({currency.upper()})')
-        plt.show()
+if __name__ == '__main__':
+    app.run(debug=True)
