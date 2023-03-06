@@ -1,4 +1,6 @@
+from datetime import datetime
 from flask import Flask, request, jsonify
+from api_logging import log_request
 import requests
 
 app = Flask(__name__)
@@ -7,7 +9,9 @@ app = Flask(__name__)
 def get_price_data():
     crypto = request.args.get('crypto')
     time = request.args.get('time')
-    
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_request(request.method, request.url, timestamp)
+
     url = f"https://api.coingecko.com/api/v3/coins/{crypto}/market_chart?vs_currency=usd&days={time}"
     
     response = requests.get(url)
@@ -27,6 +31,8 @@ def predict_price():
     crypto = request.args.get('crypto')
     time = request.args.get('time')
     days = int(request.args.get('days', '7'))
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_request(request.method, request.url, timestamp)
     
     url = f"https://api.coingecko.com/api/v3/coins/{crypto}/market_chart?vs_currency=usd&days={time}"
     
